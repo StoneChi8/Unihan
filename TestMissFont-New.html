@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自定义字体缺失字形显示为 Unicode 方块</title>
+    <style>
+        /* ===== 自定义豆腐块样式 ===== */
+        .unicode-tofu {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 1em;          /* 恰好占一个普通汉字宽度 */
+            height: 1em;         /* 恰好占一个普通汉字高度 */
+            border: 1px solid currentColor; /* 方框“□”效果 */
+            box-sizing: border-box;
+            vertical-align: 6px;  /* middle => top */
+            line-height: 1;
+            font-family: 'Courier New', monospace; /* 内部数字使用等宽字体 */
+            font-size: inherit;  /* 继承父级字体大小 */
+            background: #f8f8f8; /* 可选：淡灰背景，方便观察 */
+            user-select: none;
+        }
+
+        .tofu-top,
+        .tofu-bottom {
+            display: block;
+            font-size: 0.40em;   /* 0.32 > 0.38 内部文字缩小，适应 1em 框 */
+            line-height: 0.9;
+            text-align: center;
+            color: #333;
+            font-weight: bold;
+            /* 防止内部文字被继承额外的字体样式 */
+            font-style: normal;
+            letter-spacing: 0;
+        }
+
+        /* 测试用的段落样式 */
+        .test-area {
+            font-size: 14px;     /* 放大字体 24px pading 10px, border 1px, maging 10px 以便观察效果 */
+            font-family: 'SimSun', 'Songti SC', serif;  /* 这里指定需要检测的字体 */
+            line-height: 1.5;
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin: 10px;
+        }
+        .test-area-small {
+            font-size: 12px;
+             font-family: 'SimSun', 'Songti SC', serif; 
+        }
+
+        button {
+            font-size: 14px;
+            padding: 6px 10px;
+            margin: 0 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>测试文本（豆腐上碼）</h2>
+    <div class="test-area" id="textContainer">
+        <!-- 包含常见汉字、BMP 私用区、SIP 扩展汉字 -->
+        普通汉字：中文测试<br>
+        BMP私用区： (U+E863) 字字 (U+F8FE)大﫠小﫰一样<br>
+        SIP扩展汉字：𬎆 (U+2C386) 和字𳀀(U+33000)字𴕧大小一样<br>
+        非通规字：㱔䕒㢍㟏㹧𢒉𣍏𣍇𬎆𮧵𮀎𱳪𱏿𱮒𱗯𬬺𮣳<br>
+        PUA GB2,GB4：，<br>
+《新喻縣誌》卷四<br>
+清平寺在縣南四十里𱗯上。唐至德三年建。<br>
+    </div>
+
+
+    <script>
+        // ================================================================
+        // 1. 核心工具：检测指定字体是否支持某个字符（Canvas 像素比对法）
+        // ================================================================
+        const glyphCache = new Map(); // 简单缓存，提高重复检测性能
+
+        /**
+         * 检测某个字体是否包含指定字符的字形
+         * @param {string} fontFamily - 字体名称（如 'SimSun'、'Microsoft Yahei'）
+         * @param {string} char - 单个字符
+         * @returns {boolean} true 表示有字形，false 表示缺失（会 fallback 到 .notdef）
+         */
+        function isGlyphSupported(fontFamily, char) {
+            // 空格、换行等控制字符不处理，直接视为支持
+            if (!char || char.length === 0 || char.trim() === '' || char.charCodeAt(0) < 32) {
+                return true;
+            }
+
+            const cacheKey = fontFamily + '|' + char;
+            if (glyphCache.has(cacheKey)) {
+                return glyphCache.get(cacheKey);
+            }
+
+            const canvas = document.createElement('canvas');
+            const size = 100;
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            // 基准：使用 Unicode 非字符 U+FFFF，通常字体都会渲染为一个空矩形（豆腐块）
+            const fallbackChar = '\uFFFF';
+
+            // 清理并绘制 fallback 字符
+            ctx.textBaseline = 'top';
+            ctx.textAlign = 'left';
+            ctx.fillStyle = '#000';
+            ctx.clearRect(0, 0, size, size);
+            // ctx.font = `100px "${fontFamily}", sans-serif`; // 引号包裹字体名，以防空格
+            ctx.font = `100px "${fontFamily}", KaiTi_GB2312`; // 引号包裹字体名，以防空格
+            ctx.fillText(fallbackChar, 0, 0);
+            const fallbackData = ctx.getImageData(0, 0, size, size).data;
+
+            // 清理并绘制目标字符
+            ctx.clearRect(0, 0, size, size);
+            // ctx.font = `100px "${fontFamily}", sans-serif`;
+            ctx.font = `100px "${fontFamily}", KaiTi_GB2312`;
+            ctx.fillText(char, 0, 0);
+            const charData = ctx.getImageData(0, 0, size, size).data;
+
+            // 比对像素数据（只要有一个像素不同，说明目标字符有独立字形）
+            let isDifferent = false;
+            for (let i = 0; i < fallbackData.length; i++) {
+                if (fallbackData[i] !== charData[i]) {
+                    isDifferent = true;
+                    break;
+                }
+            }
+
+            glyphCache.set(cacheKey, isDifferent);
+            return isDifferent;
+        }
+
+        // ================================================================
+        // 2. 创建自定义豆腐块 DOM 元素（按 BMP / SIP 拆分编码）
+        // ================================================================
+        /**
+         * 根据字符生成带 Unicode 编码的方框 DOM 节点
+         * @param {string} char - 单个字符
+         * @returns {HTMLElement} span.unicode-tofu 节点
+         */
+        function createTofuSpan(char) {
+            const codePoint = char.codePointAt(0);
+            let hex = codePoint.toString(16).toUpperCase();
+            let topText, bottomText;
+
+            if (codePoint <= 0xFFFF) {
+                // BMP 平面：补足 4 位，上二下二
+                hex = hex.padStart(4, '0');
+                topText = hex.slice(0, 2);
+                bottomText = hex.slice(2, 4);
+            } else {
+                // SIP / TIP 平面（U+10000 以上）：补足 5 位，上 U + 前两位，下后三位
+                hex = hex.padStart(5, '0');
+                topText = 'U' + hex.slice(0, 2);
+                bottomText = hex.slice(2, 5);
+            }
+
+            const span = document.createElement('span');
+            span.className = 'unicode-tofu';
+            // 利用 innerHTML 快速构建内部结构
+             span.innerHTML = `
+                 <span class="tofu-top">${topText}</span>
+                 <span class="tofu-bottom">${bottomText}</span>
+             `;
+            return span;
+        }
+
+        // ================================================================
+        // 3. DOM 遍历与替换逻辑
+        // ================================================================
+        /**
+         * 遍历容器内的所有文本节点，将目标字体不支持的字符替换为自定义豆腐块
+         * @param {HTMLElement} container - 根容器
+         * @param {string} fontFamily - 要检测的字体名称（需与 CSS 中应用的字体一致）
+         */
+        function replaceMissingGlyphs(container, fontFamily) {
+            // 使用 TreeWalker 遍历所有文本节点（效率高，且不破坏事件绑定）
+            const walker = document.createTreeWalker(
+                container,
+                NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
+
+            const nodesToProcess = [];
+            let node;
+            while (node = walker.nextNode()) {
+                // 跳过空文本或纯空白文本
+                if (node.textContent && node.textContent.trim().length > 0) {
+                    nodesToProcess.push(node);
+                }
+            }
+
+            // 倒序处理（从后往前）避免因替换导致的节点索引变化，但这里我们使用 DocumentFragment 替换，顺序无所谓
+            for (const textNode of nodesToProcess) {
+                const parent = textNode.parentNode;
+                const originalText = textNode.textContent;
+
+                // 如果文本中没有可打印字符，跳过
+                if (!originalText) continue;
+
+                const fragment = document.createDocumentFragment();
+
+                // 逐字符处理
+                for (const char of originalText) {
+                    // 判断当前字体是否支持该字符
+                    if (isGlyphSupported(fontFamily, char)) {
+                        // 支持：保留原始字符（文本节点）
+                        fragment.appendChild(document.createTextNode(char));
+                    } else {
+                        // 不支持：替换为自定义豆腐块
+                        fragment.appendChild(createTofuSpan(char));
+                    }
+                }
+
+                // 用新构建的片段替换原始文本节点
+                parent.replaceChild(fragment, textNode);
+            }
+        }
+
+        /**
+         * 恢复容器内的原始纯文本（用于重置演示）
+         */
+        function resetToPlainText(container) {
+            // 移除所有 .unicode-tofu 节点，将其替换为内部存储的原始字符？
+            // 简便方法：用预先存储的原始 HTML 或 textContent 恢复
+            // 这里我们直接从容器中提取纯文本（注意会丢失原有换行结构，仅做演示）
+            // 更好的方式：在替换前保存原始文本，但为了演示，我们直接重新设置 innerText
+            // 注意：innerText 会保留换行，但会丢失内部 span 样式。
+            // 为了准确恢复，我们在替换时保存原始文本，或者在处理前深拷贝一份。
+            // 简单起见，本例使用 data-* 属性保存原始文本。
+            // 下面使用另一种方式：用 innerText 恢复（会丢失 <br> 但保留换行）
+            const plainText = container.innerText;
+            container.innerHTML = ''; // 清空
+            // 按换行分割，重新构建文本节点（保留基本换行结构）
+            const lines = plainText.split('\n');
+            for (let i = 0; i < lines.length; i++) {
+                if (i > 0) {
+                    const br = document.createElement('br');
+                    container.appendChild(br);
+                }
+                if (lines[i]) {
+                    container.appendChild(document.createTextNode(lines[i]));
+                }
+            }
+        }
+
+        // ================================================================
+        // 4. 使用示例
+        // ================================================================
+        const container = document.getElementById('textContainer');
+
+        // 注意：这里指定的字体名称必须与 CSS 中 .test-area 的 font-family 第一个主字体严格一致
+        const targetFont = 'SimSun';
+        
+        // 页面加载完成后，自动执行一次，展示效果
+        window.addEventListener('load', function() {
+            // 先重置，确保干净
+            resetToPlainText(container);
+            glyphCache.clear();
+            replaceMissingGlyphs(container, targetFont);
+        });
+    </script>
+
+</body>
+</html>
