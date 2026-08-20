@@ -3,6 +3,7 @@ Operating System-Level "Tofu Code Display" Functional Requirements Specification
 1. Background and Problem Statement
 
 1.1 Scale of the Problem
+
 According to incomplete statistics, over 60 million people in China have names that include
 rare/obscure characters (i.e., characters beyond the 6,763 Chinese characters defined in
 GB/T 2312‑1980; among these, approximately 10 million people have names containing characters
@@ -14,6 +15,7 @@ authentication, certificate applications, banking, medical registration, travel 
 and other services.
 
 Common difficulties faced by people with rare‑character names include:
+
     • Input methods cannot find the character;
     • The rare‑character name cannot match the account name exactly;
     • The character is treated as an illegal character or converted to "?" during data exchange;
@@ -29,6 +31,7 @@ a dedicated font library for population information. However, a large number of
 in this font library use PUA (Private Use Area) codes.
 
 PUA encoding causes serious problems:
+
     1. Encoding is not public: PUA is a private‑use area reserved in the Unicode standard, and
       each system can define its own mapping. However, the PUA mapping of the public security
       population information font library has not been disclosed to the public, making it
@@ -81,18 +84,19 @@ However, the reality is:
 2. Functional Requirements
 
 2.1 Core Feature: OS‑Level "Tofu Code Display"
+
 At the operating system's font rendering engine level: when a character cannot be rendered 
 because no glyph is available in the system fonts, instead of displaying a generic 
 empty square (□) or question mark (?), the system shall automatically display the
 character's Unicode code point in a visual format inside a square box, with the following format:
 
-Character Type	    Code Point Range	Display Format	                     Example
+Character Type	    Code Point Range   Display Format	                     Example
+=================   ================   ==============================        =========
+BMP characters    	U+0000 – U+FFFF	   Top row: first 2 hex digits,          U+E863 
+                                       bottom row: last 2 hex digits	      → top "E8" / bottom "63"
 
-BMP characters    	U+0000 – U+FFFF	  Top row: first 2 hex digits,         U+E863 
-                                      bottom row: last 2 hex digits	       → top "E8" / bottom "63"
-
-SIP/TIP characters	U+10000 and above	Top row: "U" + first 2 hex digits,   U+2C386 
-                                      bottom row: last 3 hex digits	       → top "U2C" / bottom "386"
+SIP/TIP characters	U+10000 and above  Top row: "U" + first 2 hex digits,    U+2C386 
+                                       bottom row: last 3 hex digits	      → top "U2C" / bottom "386"
 
 Display specifications:
     • Box size: exactly one standard Chinese character position (1em × 1em)
@@ -101,12 +105,13 @@ Display specifications:
 
 2.2 Priority by Scenario
 
-Priority	Scenario	Description
-P0       System‑level text rendering	File Explorer, desktop, taskbar, system dialogs, etc.
-P0	     Built‑in system applications	Notepad, WordPad, console/terminal, etc.
-P1	     Browser engine	Edge/Chrome rendering based on the system font engine
-P1	     Third‑party GUI apps	Applications using system font APIs (Win32/WPF/Qt, etc.)
-P2	     Printing subsystem	Print preview and actual print output
+Priority	Scenario	                 Description
+======== =============================   ===================================================
+P0       System‑level text rendering	 File Explorer, desktop, taskbar, system dialogs, etc.
+P0	     Built‑in system applications    Notepad, WordPad, console/terminal, etc.
+P1	     Browser engine                  Edge/Chrome rendering based on the system font engine
+P1	     Third‑party GUI apps	         Applications using system font APIs (Win32/WPF/Qt, etc.)
+P2	     Printing subsystem	             Print preview and actual print output
 
 3. Suggested Technical Implementation Path
 3.1 Font Rendering Engine Modifications
@@ -170,9 +175,11 @@ Add a new option under the "Fonts & Display" or "Accessibility" section in t
     2. Promotes encoding standardisation: When users can see the Unicode code point of a character,
        it creates pressure for various industries to gradually unify to national standard encodings,
        accelerating the migration from PUA to formal codes.
+
     3. Fills the information gap caused by missing fonts: Even if the operating system does not
        have a super‑large font installed, users can still know that "there is a character here
        with this specific code" rather than facing a complete information black hole.
+
     4. Reduces public service costs: Decreases the need for offline processing, manual verification,
        complaint handling, and other steps caused by unreadable rare characters.
 
@@ -180,7 +187,9 @@ Add a new option under the "Fonts & Display" or "Accessibility" section in t
 
     • Serves as a differentiating feature for operating systems, demonstrating deep understanding
       and care for Chinese users and public service scenarios.
+
     • Aligns with the spirit of the mandatory national standard GB 18030‑2022 and its Amendment No. 1.
+
     • Enables a value‑added service: offer users a "one‑click install super‑large font" option
       (after the "Tofu Code Display" is in place, users may choose to install fonts for normal rendering).
 
@@ -203,25 +212,29 @@ Add a new option under the "Fonts & Display" or "Accessibility" section in t
 5.2 Promotion Roadmap
 
 Phase	  Action	  Goal
+======    =========   ==================
 Short‑term	
-  Submit feature request proposals to operating system vendors (Microsoft, Apple, open‑source communities)
-    Inclusion in product roadmaps
+         Submit feature request proposals to operating system vendors (Microsoft, Apple, open‑source communities)
+                      Inclusion in product roadmaps
 
 Mid‑term
-  Collaborate with the Ministry of Industry and Information Technology, Ministry of Education, National 
-  Language Commission, etc., to incorporate "Tofu Code Display" into technical requirements for 
-  government procurement of operating systems
-     Establish as a standard requirement
+         Collaborate with the Ministry of Industry and Information Technology, Ministry of Education, National 
+         Language Commission, etc., to incorporate "Tofu Code Display" into technical requirements for 
+         government procurement of operating systems
+                      Establish as a standard requirement
 
 Long‑term
-  Promote the inclusion of a "Missing Glyph Visualisation Specification" into national standards
-    Unified implementation across the industry
+         Promote the inclusion of a "Missing Glyph Visualisation Specification" into national standards
+                      Unified implementation across the industry
 
 5.3 Reference Examples
+
     • Some OS or application has already supported in certain scenarios, which can display
-      missing glyphs as squares, or display squares with unicode(ie FireFox)
+      missing glyphs as squares, or display squares with unicode(ie FireFox).
+
     • Some software venders "Rare Character Solution" already addresses rare character 
       display and input issues on Windows and Linux systems.
+
     • Some font vendors already support GB18030-2022 full set glyphs to extension F, but
       not include its Amendment No. 1（unicode extension GHI).
 
@@ -229,20 +242,25 @@ Long‑term
 
 "Tofu Code Display" is not a permanent solution to the problem of displaying rare characters 
 at the OS level — the ultimate solution requires:
+
     • Government authorities to unify standards and, drawing on the experience of Japan, to provide 
       free fonts covering the modern service character set (approximately 50,000 characters) to citizens;
+
     • Simultaneously, font vendors to provide commercial or open‑source fonts covering the full character
       set of approximately 100,000 characters;
+
     • All industry systems to fully adapt to GB 18030‑2022 (including Amendment No. 1);
+
     • A complete migration from PUA to formal Unicode codes.
 
-"Tofu Code Display" is a temporary bridge that ensures the 10 million people with rare‑character names and the 50 million 
-service professionals no longer face blanks and question marks before that ultimate goal is achieved.
+"Tofu Code Display" is a temporary bridge that ensures the 10 million people with rare‑character names 
+and the 50 million service professionals no longer face blanks and question marks before that 
+ultimate goal is achieved.
 
-It makes every character's encoding visible, readable, and communicable — when the system cannot tell you "what character 
-this is," it at least tells you "which code this is." Before the ultimate vision of "unified script, unified code" is 
-realised, this is a low‑cost, high‑benefit feature that can immediately improve the digital life experience of 
-tens of millions of people.
+It makes every character's encoding visible, readable, and communicable — when the system cannot tell you
+"what character this is," it at least tells you "which code this is." Before the ultimate vision of 
+"unified script, unified code" is realised, this is a low‑cost, high‑benefit feature that can immediately
+improve the digital life experience of tens of millions of people.
 
 This requirement document is freely available for distribution and submission to operating system vendors. 
 We encourage its wide dissemination to drive industry‑wide adoption.
