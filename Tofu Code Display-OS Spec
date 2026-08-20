@@ -32,14 +32,14 @@ in this font library use PUA (Private Use Area) codes.
 
 PUA encoding causes serious problems:
 
-    1. Encoding is not public: PUA is a private‑use area reserved in the Unicode standard, and
-      each system can define its own mapping. However, the PUA mapping of the public security
-      population information font library has not been disclosed to the public, making it
-      impossible for third‑party systems to recognise the corresponding Chinese characters for these codes.
-    2. One character, multiple codes: The same rare character may use a PUA code in the public
+    a. Encoding is not public: PUA is a private‑use area reserved in the Unicode standard, and
+       each system can define its own mapping. However, the PUA mapping of the public security
+       population information font library has not been disclosed to the public, making it
+       impossible for third‑party systems to recognise the corresponding Chinese characters for these codes.
+    b. One character, multiple codes: The same rare character may use a PUA code in the public
        security system and a formal code in the national standard GB 18030.
        Without normalisation, systems cannot match them, leading to direct service refusal.
-    3. Cross‑system incompatibility: Although the public security system can display PUA characters,
+    c. Cross‑system incompatibility: Although the public security system can display PUA characters,
        other industry systems (banking, social security, transportation, healthcare, etc.) 
        do not support these PUA codes, resulting in characters being displayed as "□", "?", or blank.
 
@@ -58,16 +58,17 @@ In total, the standard requires government and public service products and syste
 approximately 100,000 Chinese characters at Implementation Level 3.
 
 However, the reality is:
-    1. Insufficient OS font coverage: Currently, default fonts installed in Windows, macOS, 
+
+    a. Insufficient OS font coverage: Currently, default fonts installed in Windows, macOS, 
        and mainstream Linux distributions cover only about 30,000 commonly used Chinese characters.
        Even if the operating system supports the Unicode encoding, if no glyph data exists for
        the character in the system fonts, it will still be displayed as a square or garbled.
 
-    2. Users cannot install missing fonts themselves: Super‑large font libraries that comply
+    b. Users cannot install missing fonts themselves: Super‑large font libraries that comply
        with GB 18030‑2022 Level 3 are mostly commercially licensed fonts, and ordinary users
        cannot obtain and install them for free.
 
-    3. Service character set is not publicly disclosed: Although the full character set
+    c. Service character set is not publicly disclosed: Although the full character set
        (approximately 100,000 characters) can theoretically display all Chinese characters,
        the actual "service character set" used in daily public services covers only about
        30,000–50,000 characters. This character set has not been made public, and the
@@ -76,7 +77,7 @@ However, the reality is:
         whether a missing character falls within the service character set, turning what
         could be an expected display problem into an uncertainty problem.
 
-    4. Application‑level solutions are insufficient: Even if the browser or application
+    d. Application‑level solutions are insufficient: Even if the browser or application
        implements a "tofu code" solution, numerous system‑level scenarios such as
        system dialogs, file managers, consoles, and third‑party applications still
        cannot display these newly encoded Chinese characters.
@@ -151,60 +152,61 @@ SetProcessGlyphRenderMode(GlyphRenderMode_TofuCode);
 
 3.3 System Settings Entry
 Add a new option under the "Fonts & Display" or "Accessibility" section in the operating system settings:
-    • Option name: "Display mode for missing glyphs"
-    • Options:
+    a. Option name: "Display mode for missing glyphs"
+    b. Options:
         ◦ Traditional blank square (□) (default, for compatibility)
         ◦ Show Unicode encoding (Tofu Code Display)
-    • Description: "When the system cannot display a character due to missing font glyphs,
-      show its Unicode code point instead."
+    c. Description: "When the system cannot display a character due to missing font glyphs,
+       show its Unicode code point instead."
 
 4. Expected Benefits
 
 4.1 Directly Benefited Population
-    • 60 million residents with rare‑character names: they can "see" the encoding of their own names
-      in any scenario, rather than blanks or question marks.
-    • All public service personnel who need to process rare‑character information: they can visually
-      identify the character encoding, facilitating manual verification and handling.
+
+    a. 60 million residents with rare‑character names: they can "see" the encoding of their own names
+       in any scenario, rather than blanks or question marks.
+    b. All public service personnel who need to process rare‑character information: they can visually
+       identify the character encoding, facilitating manual verification and handling.
 
 4.2 Social Benefits
 
-    1. Reduces the burden of "proving I am myself": People with rare‑character names often need to
+    a. Reduces the burden of "proving I am myself": People with rare‑character names often need to
        repeatedly prove their identity because systems cannot display their names correctly. 
        "Tofu Code Display" makes the encoding visible, enabling easier manual comparison and communication.
 
-    2. Promotes encoding standardisation: When users can see the Unicode code point of a character,
+    b. Promotes encoding standardisation: When users can see the Unicode code point of a character,
        it creates pressure for various industries to gradually unify to national standard encodings,
        accelerating the migration from PUA to formal codes.
 
-    3. Fills the information gap caused by missing fonts: Even if the operating system does not
+    c. Fills the information gap caused by missing fonts: Even if the operating system does not
        have a super‑large font installed, users can still know that "there is a character here
        with this specific code" rather than facing a complete information black hole.
 
-    4. Reduces public service costs: Decreases the need for offline processing, manual verification,
+    d. Reduces public service costs: Decreases the need for offline processing, manual verification,
        complaint handling, and other steps caused by unreadable rare characters.
 
 4.3 Commercial Benefits
 
-    • Serves as a differentiating feature for operating systems, demonstrating deep understanding
-      and care for Chinese users and public service scenarios.
+    a. Serves as a differentiating feature for operating systems, demonstrating deep understanding
+       and care for Chinese users and public service scenarios.
 
-    • Aligns with the spirit of the mandatory national standard GB 18030‑2022 and its Amendment No. 1.
+    b. Aligns with the spirit of the mandatory national standard GB 18030‑2022 and its Amendment No. 1.
 
-    • Enables a value‑added service: offer users a "one‑click install super‑large font" option
-      (after the "Tofu Code Display" is in place, users may choose to install fonts for normal rendering).
+    c. Enables a value‑added service: offer users a "one‑click install super‑large font" option
+       (after the "Tofu Code Display" is in place, users may choose to install fonts for normal rendering).
 
 5. Promotion Recommendations
 
 5.1 Policy Foundations
 
-    1.GB 18030‑2022 "Information Technology – Chinese Coded Character Set": A mandatory national standard 
+    a.GB 18030‑2022 "Information Technology – Chinese Coded Character Set": A mandatory national standard 
       requiring government and public service products and systems to support approximately 100,000 
       Chinese characters (including the additions from Amendment No. 1).
 
-    2.JR/T 0253‑2022 "Financial Services – Guidelines for Handling Rare Characters": An industry standard 
+    b.JR/T 0253‑2022 "Financial Services – Guidelines for Handling Rare Characters": An industry standard 
       for the financial sector, providing guidelines for rare character processing.
 
-    3."Opinions on Strengthening Digital Chinese Construction and Promoting the Information Technology 
+    c."Opinions on Strengthening Digital Chinese Construction and Promoting the Information Technology 
       Development of Language and Writing": Jointly issued by the Ministry of Education, the National 
       Language Commission, and the Cyberspace Administration of China, promoting the informatisation 
       of language and writing.
@@ -229,29 +231,29 @@ Long‑term
 
 5.3 Reference Examples
 
-    • Some OS or application has already supported in certain scenarios, which can display
-      missing glyphs as squares, or display squares with unicode(ie FireFox).
+    a. Some OS or application has already supported in certain scenarios, which can display
+       missing glyphs as squares, or display squares with unicode(ie FireFox).
 
-    • Some software venders "Rare Character Solution" already addresses rare character 
-      display and input issues on Windows and Linux systems.
+    b. Some software venders "Rare Character Solution" already addresses rare character 
+       display and input issues on Windows and Linux systems.
 
-    • Some font vendors already support GB18030-2022 full set glyphs to extension F, but
-      not include its Amendment No. 1（unicode extension GHI).
+    c. Some font vendors already support GB18030-2022 full set glyphs to extension F, but
+       not include its Amendment No. 1（unicode extension GHI).
 
 6. Conclusion
 
 "Tofu Code Display" is not a permanent solution to the problem of displaying rare characters 
 at the OS level — the ultimate solution requires:
 
-    • Government authorities to unify standards and, drawing on the experience of Japan, to provide 
-      free fonts covering the modern service character set (approximately 50,000 characters) to citizens;
+    a. Government authorities to unify standards and, drawing on the experience of Japan, to provide 
+       free fonts covering the modern service character set (approximately 50,000 characters) to citizens;
 
-    • Simultaneously, font vendors to provide commercial or open‑source fonts covering the full character
-      set of approximately 100,000 characters;
+    b. Simultaneously, font vendors to provide commercial or open‑source fonts covering the full character
+       set of approximately 100,000 characters;
 
-    • All industry systems to fully adapt to GB 18030‑2022 (including Amendment No. 1);
+    c. All industry systems to fully adapt to GB 18030‑2022 (including Amendment No. 1);
 
-    • A complete migration from PUA to formal Unicode codes.
+    d. A complete migration from PUA to formal Unicode codes.
 
 "Tofu Code Display" is a temporary bridge that ensures the 10 million people with rare‑character names 
 and the 50 million service professionals no longer face blanks and question marks before that 
@@ -264,3 +266,12 @@ improve the digital life experience of tens of millions of people.
 
 This requirement document is freely available for distribution and submission to operating system vendors. 
 We encourage its wide dissemination to drive industry‑wide adoption.
+
+Reference:
+
+1.https://www.digital.go.jp/policies/local_governments/character-specification
+2.http://www.moe.gov.cn/srcsite/A19/s7067/202503/t20250328_1185224.html
+3.https://mp.weixin.qq.com/s/4U2J68B-6VUwzwbuF3RiGA, JR/T 0253-2022
+4.https://zhuanlan.zhihu.com/p/2073716920285651043, the text chinese version
+5.https://zhuanlan.zhihu.com/p/709824011, w3c work document:
+     Client-side input validation and client-server communication methods for Chinese characters
