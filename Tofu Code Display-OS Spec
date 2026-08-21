@@ -34,8 +34,11 @@ PUA encoding causes serious problems:
 
     a. Encoding is not public: PUA is a private‑use area reserved in the Unicode standard, and
        each system can define its own mapping. However, the PUA mapping of the public security
-       population information font library has not been disclosed to the public, making it
-       impossible for third‑party systems to recognise the corresponding Chinese characters for these codes.
+       population information font library (more than 4800 characters, more than 4500 already 
+       encoded in unicode standard) has not been disclosed to the public, making it impossible 
+       for third‑party systems to recognise the corresponding Chinese characters for these codes.
+       Also other sofware or authority has its own PUA chracter font set, i.e. Sougou ime application
+       before version 13.6 define 415 PUA characters. 
     b. One character, multiple codes: The same rare character may use a PUA code in the public
        security system and a formal code in the national standard GB 18030.
        Without normalisation, systems cannot match them, leading to direct service refusal.
@@ -251,7 +254,7 @@ at the OS level — the ultimate solution requires:
     b. Simultaneously, font vendors to provide commercial or open‑source fonts covering the full character
        set of approximately 100,000 characters;
 
-    c. All industry systems to fully adapt to GB 18030‑2022 (including Amendment No. 1);
+    c. All industry systems to fully adapt to GB 18030‑2022 (including afterward Amendments);
 
     d. A complete migration from PUA to formal Unicode codes.
 
@@ -275,3 +278,4 @@ Reference:
 4.https://zhuanlan.zhihu.com/p/2073716920285651043, the text chinese version
 5.https://zhuanlan.zhihu.com/p/709824011, w3c work document:
      Client-side input validation and client-server communication methods for Chinese characters
+6.https://www.zhihu.com/question/325533237/answer/701324778, Sougou IME PUA characters list
